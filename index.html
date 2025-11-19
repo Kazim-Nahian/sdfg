@@ -1,71 +1,434 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="bn">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>এসএসসি রসায়ন — অধ্যায়ভিত্তিক নোট (কাজিম ভাইয়া)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root{ --bg1:#071220; --bg2:#08182a; --accent:#00e0ff; --card:rgba(255,255,255,0.03); --muted:#b7d3ee; --danger:#ff6b6b }
-    *{box-sizing:border-box}
-    body{font-family:'Noto Sans Bengali',sans-serif;margin:0;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:#e9f6ff;min-height:100vh;overflow-x:hidden}
-    header{padding:18px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.04)}
-    header h1{margin:0;color:var(--accent)}
-    .container{max-width:1100px;margin:24px auto;padding:16px;position:relative}
-    .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-    .searchbar{display:flex;gap:8px;align-items:center}
-    input,button,select,textarea{font-family:inherit}
-    input[type=search]{padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:inherit;min-width:260px}
-    .chips{display:flex;gap:8px;flex-wrap:wrap}
-    .chip{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:999px;cursor:pointer}
-    .controls{display:flex;gap:8px;align-items:center}
-    .btn{padding:8px 12px;border-radius:8px;border:none;background:var(--accent);color:#012;font-weight:700;cursor:pointer}
-    .grid{margin-top:18px;display:grid;grid-template-columns:1fr;gap:12px}
-    .chapter{background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-    .chapter-header{display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer}
-    .chapter-title{font-weight:700}
-    .progress{height:10px;background:rgba(255,255,255,0.04);border-radius:999px;overflow:hidden;width:160px}
-    .progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#7afcff);width:0}
-    .chapter-body{margin-top:10px;display:none;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.03)}
-    .card-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .small{color:var(--muted);font-size:0.95rem}
-    .pomodoro{position:fixed;right:18px;bottom:18px;background:var(--card);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);width:220px}
-    .timer{font-size:1.3rem;font-weight:700;text-align:center}
-    .top-right{display:flex;gap:8px;align-items:center}
-    @media(max-width:760px){.topbar{flex-direction:column;align-items:stretch}}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>কাজিম ভাইয়ের রসায়ন নোট – অধ্যায়ভিত্তিক PDF এবং Pomodoro সহ</title>
+<meta name="theme-color" content="#3ea0ff">
+<style>
+:root{
+  --accent:#3ea0ff;
+  --accent-2:#236fbf;
+  --muted:#556677;
+  --bg:#f5fbff;
+  --card:#ffffff;
+  --glass:rgba(255,255,255,0.85);
+  --danger:#e04b4b;
+  --radius:14px;
+  --gap:12px;
+  font-family: "Noto Sans Bengali", "Segoe UI", Roboto, system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  padding:14px;
+  background:linear-gradient(180deg,#eef9ff 0%, #f7fdff 60%);
+  color:#082033;
+  display:flex;
+  justify-content:center;
+  font-size:15px;
+  line-height:1.45;
+}
+.app{width:100%;max-width:520px;display:flex;flex-direction:column;gap:var(--gap);}
+.header{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:14px;border-radius:18px;box-shadow:0 8px 28px rgba(33,102,180,0.12);}
+.header h1{font-size:18px;margin:0}
+.header p{margin:6px 0 0;font-size:13px;opacity:0.95}
+.card{background:var(--card);border-radius:14px;padding:12px;box-shadow:0 8px 26px rgba(20,60,100,0.04);}
+.lock-row{display:flex;gap:8px;align-items:center}
+.lock-row input[type="password"]{flex:1;padding:12px;border-radius:12px;border:1px solid rgba(34,100,180,0.08);outline:none;background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,255,255,0.9));font-size:15px;}
+.btn{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff;border:none;padding:10px 12px;border-radius:12px;font-weight:700;cursor:pointer;min-width:88px;}
+.btn.ghost{background:transparent;border:1px solid rgba(35,111,191,0.08);color:var(--accent-2);}
+.warn{color:var(--danger);margin-top:8px;font-weight:700;display:none}
+.chapter{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(34,100,180,0.04);margin-top:8px;}
+.chapter .meta{display:flex;gap:8px;align-items:center}
+.chapter h4{margin:0;font-size:15px}
+.controls{display:flex;gap:6px;align-items:center}
+.small-btn{background:transparent;border:1px solid rgba(34,100,180,0.06);padding:8px 10px;border-radius:10px;font-weight:700;color:var(--accent-2);cursor:pointer;}
+.checkbox{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px}
+.progress-wrap{margin-top:12px;padding:10px;border-radius:12px;background:linear-gradient(180deg,#fff,#fbfdff);border:1px solid rgba(34,100,180,0.04)}
+.progress{height:12px;background:#eaf6ff;border-radius:10px;overflow:hidden}
+.progress > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .45s ease}
+.progress-text{margin-top:8px;font-weight:800;color:var(--accent-2);font-size:13px}
+.tools{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.time-display{font-size:28px;font-weight:900;color:var(--accent-2);padding:8px 12px;border-radius:12px;background:linear-gradient(180deg,rgba(62,160,255,0.06),rgba(35,111,191,0.03));display:inline-block}
+.tool-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.note-textarea{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(34,100,180,0.06);resize:vertical;min-height:120px;margin-top:8px}
+.glow{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:10px;background:linear-gradient(90deg, rgba(62,160,255,0.06), rgba(35,111,191,0.03));gap:8px}
+.file-name{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60%}
+.audio-controls{display:flex;gap:8px;align-items:center}
+.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(4,20,40,0.45);z-index:100}
+.modal-backdrop.show{display:flex}
+.modal{width:92%;max-width:520px;background:linear-gradient(180deg,#fff,#f8fcff);padding:14px;border-radius:12px;box-shadow:0 26px 70px rgba(3,32,63,0.22)}
+.modal .link{display:block;padding:10px;border-radius:10px;border:1px dashed rgba(34,100,180,0.08);color:var(--accent-2);text-decoration:none;margin-bottom:8px;background:linear-gradient(180deg,#fff,#f7fbff);word-break:break-all}
+footer{ text-align:center;color:var(--muted);font-size:13px;padding:8px 0;opacity:0.95}
+@media (max-width:420px){
+  body{padding:10px}
+  .header h1{font-size:16px}
+  .time-display{font-size:24px}
+  .btn{min-width:72px;padding:9px 10px}
+  .file-name{max-width:52%}
+}
+</style>
 </head>
 <body>
-  <header>
-    <h1>এসএসসি রসায়ন — অধ্যায়ভিত্তিক নোট</h1>
-    <p class="small">প্রস্তুতকারক: কাজিম নাহিয়ান • সকল নোট PDF (অধ্যায়ভিত্তিক)</p>
-  </header>
-  <main class="container">
-    <section class="grid" id="chaptersGrid"></section>
-  </main>
-  <script>
-    const chapters = [
-      {id:1,title:'অধ্যায় ১ — রসায়নের ধারণা',link:'https://drive.google.com/drive/folders/1Ds1yv14TW_U_fEAQ1CmGNVGWCLsu3mZR?usp=drive_link'},
-      {id:2,title:'অধ্যায় ২ — পদার্থের অবস্থা',link:'https://drive.google.com/drive/folders/10VaPzj7WFdz5bLKWtMWC5FbcAdFPrK9b?usp=drive_link'},
-      {id:3,title:'অধ্যায় ৩ — পদার্থের গঠন',link:'https://drive.google.com/drive/folders/1bqV_T9nmr9tR4nlpLbZIOQyEa_Xs0zLB?usp=drive_link'},
-      {id:4,title:'অধ্যায় ৪ — পর্যায় সারণি',link:'https://drive.google.com/drive/folders/10xSn6i4Rpsz2lTUEUZDwHcb_RcHg4Atk?usp=drive_link'},
-      {id:5,title:'অধ্যায় ৫ — রাসায়নিক বন্ধন',link:'https://drive.google.com/drive/folders/13AhbHSl_0ZinblLKlKqQVV6JWUNNTmux?usp=drive_link'},
-      {id:6,title:'অধ্যায় ৬ — মোলের ধারণা ও রাসায়নিক গণনা',link:'https://drive.google.com/drive/folders/1Hq8zkRDLcnCZIwuoRhe9BkeAhF-ffW_h?usp=drive_link'},
-      {id:7,title:'অধ্যায় ৭ — রাসায়িক বিক্রিয়া',link:'https://drive.google.com/drive/folders/1qlsKEjrqASsRC_W7cPiqNrhX_JPahoAH?usp=drive_link'},
-      {id:8,title:'অধ্যায় ৮ — রসায়ন ও শক্তি',link:'https://drive.google.com/drive/folders/13XBRj19VB8wdPC1hfi7Bss2JblTPKJFk?usp=drive_link'},
-      {id:9,title:'অধ্যায় ৯ — এসিড-ক্ষারক সমতা',link:'https://drive.google.com/drive/folders/1yTXT_DG7MGhtEVTEiWig97sd61ORucgN?usp=drive_link'},
-      {id:10,title:'অধ্যায় ১০ — খনিজ সম্পদঃ ধাতু ও অধাতু',link:'https://drive.google.com/drive/folders/1Ii6tbS5hB6tEJBHf4LMWepluDKYRBrUF?usp=drive_link'},
-      {id:11,title:'অধ্যায় ১১ — খনিজ সম্পদঃ জীবাশ্ম',link:'https://drive.google.com/drive/folders/18Yp5bORxS-kZAy4I-A-3wVnFGZGATRNC?usp=drive_link'},
-      {id:12,title:'অধ্যায় ১২ — আমাদের জীবনে রসায়ন',link:'https://drive.google.com/drive/folders/1ahUumVvXBiyy1Urug5cjM5jturpqwq5_?usp=drive_link'}
-    ];
 
-    const grid = document.getElementById('chaptersGrid');
-    chapters.forEach(ch => {
-      const card = document.createElement('div');
-      card.className = 'chapter';
-      card.innerHTML = `<h3>${ch.title}</h3><a href='${ch.link}' target='_blank' class='btn'>PDF খুলুন</a>`;
-      grid.appendChild(card);
-    });
-  </script>
+<div class="app" role="application" aria-label="রসায়ন নোট অ্যাপ">
+
+  <div class="header card" role="banner">
+    <h1>কাজিম ভাইয়ের রসায়ন নোট</h1>
+    <p>পাসওয়ার্ড দিয়ে অধ্যায় আনলক করো — অধ্যায় ১-এর জন্য লিংক যোগ করা হয়নি</p>
+  </div>
+
+  <div class="card" id="lockCard" aria-live="polite">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <strong>পাসওয়ার্ড আনলক</strong>
+      <small style="color:var(--muted)"></small>
+    </div>
+    <div class="lock-row">
+      <input id="pw" type="password" placeholder="পাসওয়ার্ড লিখো..." aria-label="পাসওয়ার্ড">
+      <button class="btn" id="unlockBtn">আনলক করো</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px">
+      <button class="btn ghost" id="resetAttempts">চেষ্টা রিসেট করো</button>
+      <div style="flex:1"></div>
+      <div id="lockInfo" style="color:var(--danger);font-weight:800;display:none"></div>
+    </div>
+    <div class="warn" id="warnMsg" role="status">ভুল পাসওয়ার্ড</div>
+  </div>
+
+  <div id="chaptersArea" style="display:none">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>অধ্যায় তালিকা</strong>
+        <small style="color:var(--muted)">মোট <span id="totalChapters">12</span></small>
+      </div>
+      <div id="chaptersList" aria-live="polite"></div>
+      <div class="progress-wrap" aria-hidden="false">
+        <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <i id="progressBar"></i>
+        </div>
+        <div class="progress-text" id="progressText">প্রগতি: 0%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <strong>নিজের নোট (Local)</strong>
+        <small style="color:var(--muted)">LocalStorage এ সংরক্ষিত হবে</small>
+      </div>
+      <textarea id="noteText" class="note-textarea" placeholder="এখানে তোমার কেমিস্ট্রি সংক্ষিপ্ত নোট লিখে রাখো..."></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="btn" id="saveNote">সেভ করো</button>
+        <button class="btn ghost" id="clearNote">ক্লিয়ার করো</button>
+      </div>
+      <div id="noteSaved" style="color:var(--accent-2);font-weight:700;margin-top:8px;display:none">সফলভাবে সংরক্ষিত হয়েছে</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>পোমোডোরো টাইমার</strong>
+      <small style="color:var(--muted)">২৫মিন কাজ / ৫মিন বিরতি</small>
+    </div>
+    <div style="height:10px"></div>
+    <div class="tool-row" style="align-items:center;justify-content:space-between">
+      <div class="time-display" id="timeDisplay">25:00</div>
+      <div style="text-align:right;color:var(--muted);font-size:13px">স্টেট: <span id="timerState">প্রস্তুত</span></div>
+    </div>
+    <div style="height:10px"></div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="startTimer">স্টার্ট</button>
+      <button class="btn ghost" id="pauseTimer">পজ</button>
+      <button class="btn ghost" id="resetTimer">রিসেট</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <strong>লোকাল অডিও প্লেয়ার</strong>
+      <small style="color:var(--muted)">নিজের ফাইল সিলেক্ট করো</small>
+    </div>
+    <div style="height:8px"></div>
+    <div class="glow">
+      <div class="file-name" id="fileName">কোনো ফাইল নির্বাচন করা হয়নি</div>
+      <div class="audio-controls">
+        <label class="btn" for="audioFile" style="cursor:pointer;padding:8px 10px">ফাইল নির্বাচন</label>
+        <input id="audioFile" type="file" accept="audio/*" style="display:none">
+        <button class="btn ghost" id="playPauseAudio" disabled>প্লে</button>
+      </div>
+    </div>
+    <audio id="player" controls style="width:100%;margin-top:8px;display:none"></audio>
+  </div>
+
+  <footer>© 2025 কাজিম ভাইয়ের রসায়ন নোট — Local only</footer>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle">পিডিএফ লিংক</h3>
+    <p style="color:var(--muted);margin-top:6px">নীচের লিংকটি ক্লিক করে পিডিএফ খুলুন (যদি লিংক থাকে)</p>
+    <div id="modalLinks" style="margin-top:8px"></div>
+    <div style="text-align:right;margin-top:10px"><button class="btn ghost" id="closeModal">বন্ধ করো</button></div>
+  </div>
+</div>
+
+<script>
+/* ===========================
+   Chapters Data
+   =========================== */
+const chapters = [
+  {id:1,title:"রসায়নের ধারণা ও এর প্রয়োগ", link:""},
+  {id:2,title:"পদার্থের অবস্থা", link:"https://drive.google.com/..."},
+  {id:3,title:"পদার্থের গঠন", link:"https://drive.google.com/..."},
+  {id:4,title:"পর্যায় সারণি", link:"https://drive.google.com/..."},
+  {id:5,title:"রাসায়নিক বন্ধন", link:"https://drive.google.com/..."},
+  {id:6,title:"মোলের ধারণা ও রাসায়নিক গণনা", link:"https://drive.google.com/..."},
+  {id:7,title:"রাসায়নিক বিক্রিয়া", link:"https://drive.google.com/..."},
+  {id:8,title:"রসায়ন ও শক্তি", link:"https://drive.google.com/..."},
+  {id:9,title:"এসিড-ক্ষারক সমতা", link:"https://drive.google.com/..."},
+  {id:10,title:"খনিজ সম্পদঃ ধাতু ও অধাতু", link:"https://drive.google.com/..."},
+  {id:11,title:"খনিজ সম্পদঃ জীবাশ্ম", link:"https://drive.google.com/..."},
+  {id:12,title:"আমাদের জীবনে রসায়ন", link:"https://drive.google.com/..."}
+];
+
+/* ===========================
+   Config
+   =========================== */
+const CORRECT_PW="chem2025";
+const MAX_ATTEMPTS=5;
+const LOCK_SECONDS=30;
+const AUTO_LOCK_INTERVAL=60*1000; // 1 মিনিট
+
+/* LocalStorage Keys */
+const KEYS={PROG:'kb_chem_prog_v1',UNLOCK:'kb_chem_un_v1',ATT:'kb_chem_att_v1',LOCK:'kb_chem_lock_v1',NOTE:'kb_chem_note_v1'};
+
+/* Helper functions */
+function saveProgress(obj){ localStorage.setItem(KEYS.PROG,JSON.stringify(obj)); }
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem(KEYS.PROG))||{} }catch(e){ return {}; } }
+function saveUnlocked(v){ localStorage.setItem(KEYS.UNLOCK, v?'1':'0'); }
+function isUnlocked(){ return localStorage.getItem(KEYS.UNLOCK)==='1'; }
+function saveAttempts(n){ localStorage.setItem(KEYS.ATT,String(n)); }
+function loadAttempts(){ return parseInt(localStorage.getItem(KEYS.ATT))||0; }
+function saveLockUntil(ts){ if(ts)localStorage.setItem(KEYS.LOCK,String(ts)); else localStorage.removeItem(KEYS.LOCK); }
+function loadLockUntil(){ const v=localStorage.getItem(KEYS.LOCK); return v?parseInt(v,10):null; }
+function saveNote(s){ localStorage.setItem(KEYS.NOTE,s||''); }
+function loadNote(){ return localStorage.getItem(KEYS.NOTE)||''; }
+
+/* DOM refs */
+const pwInput=document.getElementById('pw');
+const unlockBtn=document.getElementById('unlockBtn');
+const warnMsg=document.getElementById('warnMsg');
+const chaptersArea=document.getElementById('chaptersArea');
+const chaptersList=document.getElementById('chaptersList');
+const progressBar=document.getElementById('progressBar');
+const progressText=document.getElementById('progressText');
+const modalBackdrop=document.getElementById('modalBackdrop');
+const modalLinks=document.getElementById('modalLinks');
+const closeModal=document.getElementById('closeModal');
+const lockInfo=document.getElementById('lockInfo');
+const resetAttemptsBtn=document.getElementById('resetAttempts');
+const totalChaptersEl=document.getElementById('totalChapters');
+const noteText=document.getElementById('noteText');
+const saveNoteBtn=document.getElementById('saveNote');
+const clearNoteBtn=document.getElementById('clearNote');
+const noteSaved=document.getElementById('noteSaved');
+
+/* ===========================
+   State
+   =========================== */
+let attempts=loadAttempts()||0;
+let lockInterval=null;
+let autoLockTimer=null;
+
+/* ===========================
+   Chapters Rendering
+   =========================== */
+function renderChapters(){
+  chaptersList.innerHTML='';
+  const saved=loadProgress();
+  chapters.forEach(ch=>{
+    const div=document.createElement('div');
+    div.className='chapter';
+    div.innerHTML=`
+      <div class="meta">
+        <div>
+          <h4>${ch.title}</h4>
+          <div style="color:var(--muted);font-size:13px">${ch.link?'পিডিএফ উপলব্ধ':'পিডিএফ নেই'}</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="small-btn" data-id="${ch.id}" ${!ch.link?'disabled':''}>খুলো</button>
+        <label class="checkbox"><input type="checkbox" ${saved[ch.id]?'checked':''}> সম্পন্ন</label>
+      </div>`;
+    chaptersList.appendChild(div);
+  });
+  updateProgress();
+}
+function updateProgress(){
+  const saved=loadProgress();
+  const done=Object.values(saved).filter(v=>v).length;
+  const pct=Math.round((done/chapters.length)*100);
+  progressBar.style.width=pct+'%';
+  progressText.textContent='প্রগতি: '+pct+'%';
+}
+
+/* ===========================
+   Unlock Logic
+   =========================== */
+function lockApp(msg){
+  chaptersArea.style.display='none';
+  unlockBtn.disabled=true;
+  pwInput.disabled=true;
+  let until=Date.now()+LOCK_SECONDS*1000;
+  saveLockUntil(until);
+  lockInfo.style.display='inline';
+  lockInfo.textContent=`লক হয়েছে ${LOCK_SECONDS} সেকেন্ডের জন্য`;
+  lockInterval=setInterval(()=>{
+    const rem=Math.ceil((until-Date.now())/1000);
+    if(rem<=0){ clearInterval(lockInterval); unlockBtn.disabled=false; pwInput.disabled=false; lockInfo.style.display='none'; saveLockUntil(null); }
+    else lockInfo.textContent=`লক হয়েছে ${rem} সেকেন্ডের জন্য`;
+  },500);
+}
+function unlockApp(){
+  if(isUnlocked()) return showChapters();
+  if(loadLockUntil() && Date.now()<loadLockUntil()){ lockApp(); return; }
+
+  const val=pwInput.value.trim();
+  if(val===CORRECT_PW){
+    attempts=0;
+    saveAttempts(attempts);
+    saveUnlocked(true);
+    showChapters();
+  }else{
+    attempts++;
+    saveAttempts(attempts);
+    warnMsg.style.display='block';
+    setTimeout(()=>warnMsg.style.display='none',1800);
+    if(attempts>=MAX_ATTEMPTS) lockApp();
+  }
+}
+function showChapters(){
+  chaptersArea.style.display='block';
+  renderChapters();
+  pwInput.value='';
+  startAutoLock();
+}
+
+/* ===========================
+   Auto Lock Every Minute
+   =========================== */
+function startAutoLock(){
+  if(autoLockTimer) clearTimeout(autoLockTimer);
+  autoLockTimer=setTimeout(()=>{
+    saveUnlocked(false);
+    alert('অ্যাপ স্বয়ংক্রিয়ভাবে লক হয়েছে।');
+    location.reload();
+  },AUTO_LOCK_INTERVAL);
+}
+document.addEventListener('click',startAutoLock);
+
+/* ===========================
+   Events
+   =========================== */
+unlockBtn.addEventListener('click',unlockApp);
+pwInput.addEventListener('keydown',e=>{if(e.key==='Enter') unlockApp();});
+resetAttemptsBtn.addEventListener('click',()=>{ attempts=0; saveAttempts(attempts); lockInfo.style.display='none'; });
+
+chaptersList.addEventListener('change',e=>{
+  if(e.target.tagName==='INPUT' && e.target.type==='checkbox'){
+    const chId=parseInt(e.target.closest('.chapter').querySelector('button')?.dataset.id);
+    if(chId){ let prog=loadProgress(); prog[chId]=e.target.checked; saveProgress(prog); updateProgress(); }
+  }
+});
+chaptersList.addEventListener('click',e=>{
+  if(e.target.tagName==='BUTTON'){
+    const chId=parseInt(e.target.dataset.id);
+    if(chId && chapters[chId-1].link) openModal(chapters[chId-1].link);
+  }
+});
+
+/* ===========================
+   Modal
+   =========================== */
+function openModal(link){ modalLinks.innerHTML=`<a href="${link}" target="_blank" class="link">পিডিএফ খুলুন</a>`; modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); }
+closeModal.addEventListener('click',()=>{ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); });
+
+/* ===========================
+   Notes
+   =========================== */
+noteText.value=loadNote();
+saveNoteBtn.addEventListener('click',()=>{
+  saveNote(noteText.value);
+  noteSaved.style.display='block';
+  setTimeout(()=>noteSaved.style.display='none',1800);
+});
+clearNoteBtn.addEventListener('click',()=>{
+  noteText.value=''; saveNote(''); noteSaved.style.display='none';
+});
+
+/* ===========================
+   Audio Player
+   =========================== */
+const audioInput=document.getElementById('audioFile');
+const player=document.getElementById('player');
+const playPauseAudio=document.getElementById('playPauseAudio');
+const fileNameEl=document.getElementById('fileName');
+let isPlaying=false;
+
+audioInput.addEventListener('change',()=>{
+  const file=audioInput.files[0];
+  if(file){
+    const url=URL.createObjectURL(file);
+    player.src=url;
+    player.style.display='block';
+    playPauseAudio.disabled=false;
+    fileNameEl.textContent=file.name;
+    isPlaying=false; playPauseAudio.textContent='প্লে';
+  }
+});
+playPauseAudio.addEventListener('click',()=>{
+  if(isPlaying){ player.pause(); playPauseAudio.textContent='প্লে'; isPlaying=false; }
+  else{ player.play(); playPauseAudio.textContent='পজ'; isPlaying=true; }
+});
+
+/* ===========================
+   Pomodoro Timer
+   =========================== */
+let timerInterval=null, timerSec=25*60, isBreak=false;
+const timeDisplay=document.getElementById('timeDisplay');
+const timerState=document.getElementById('timerState');
+const startTimer=document.getElementById('startTimer');
+const pauseTimer=document.getElementById('pauseTimer');
+const resetTimer=document.getElementById('resetTimer');
+
+function updateTimerDisplay(){
+  const m=Math.floor(timerSec/60).toString().padStart(2,'0');
+  const s=(timerSec%60).toString().padStart(2,'0');
+  timeDisplay.textContent=`${m}:${s}`;
+  timerState.textContent=isBreak?'বিরতি':'কাজ চলছে';
+}
+
+function startPomodoro(){
+  if(timerInterval) return;
+  timerInterval=setInterval(()=>{
+    timerSec--;
+    updateTimerDisplay();
+    if(timerSec<=0){ clearInterval(timerInterval); timerInterval=null; isBreak=!isBreak; timerSec=isBreak?5*60:25*60; alert(isBreak?'বিরতি শুরু':'কাজ শুরু'); updateTimerDisplay(); startPomodoro(); }
+  },1000);
+}
+function pausePomodoro(){ clearInterval(timerInterval); timerInterval=null; }
+function resetPomodoro(){ clearInterval(timerInterval); timerInterval=null; isBreak=false; timerSec=25*60; updateTimerDisplay(); }
+
+startTimer.addEventListener('click',startPomodoro);
+pauseTimer.addEventListener('click',pausePomodoro);
+resetTimer.addEventListener('click',resetPomodoro);
+
+/* ===========================
+   Init
+   =========================== */
+if(isUnlocked()) showChapters();
+</script>
 </body>
 </html>
