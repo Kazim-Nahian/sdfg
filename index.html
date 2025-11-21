@@ -197,3 +197,242 @@ const chapters = [
 /* ===========================
    Config
    =========================== */
+
+  const CORRECT_PW="chem2025";
+const MAX_ATTEMPTS=5;
+const LOCK_SECONDS=30;
+const AUTO_LOCK_INTERVAL=60*850; // 1 মিনিট
+
+/* LocalStorage Keys */
+const KEYS={PROG:'kb_chem_prog_v1',UNLOCK:'kb_chem_un_v1',ATT:'kb_chem_att_v1',LOCK:'kb_chem_lock_v1',NOTE:'kb_chem_note_v1'};
+
+/* Helper functions */
+function saveProgress(obj){ localStorage.setItem(KEYS.PROG,JSON.stringify(obj)); }
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem(KEYS.PROG))||{} }catch(e){ return {}; } }
+function saveUnlocked(v){ localStorage.setItem(KEYS.UNLOCK, v?'1':'0'); }
+function isUnlocked(){ return localStorage.getItem(KEYS.UNLOCK)==='1'; }
+function saveAttempts(n){ localStorage.setItem(KEYS.ATT,String(n)); }
+function loadAttempts(){ return parseInt(localStorage.getItem(KEYS.ATT))||0; }
+function saveLockUntil(ts){ if(ts)localStorage.setItem(KEYS.LOCK,String(ts)); else localStorage.removeItem(KEYS.LOCK); }
+function loadLockUntil(){ const v=localStorage.getItem(KEYS.LOCK); return v?parseInt(v,10):null; }
+function saveNote(s){ localStorage.setItem(KEYS.NOTE,s||''); }
+function loadNote(){ return localStorage.getItem(KEYS.NOTE)||''; }
+
+/* DOM refs */
+const pwInput=document.getElementById('pw');
+const unlockBtn=document.getElementById('unlockBtn');
+const warnMsg=document.getElementById('warnMsg');
+const chaptersArea=document.getElementById('chaptersArea');
+const chaptersList=document.getElementById('chaptersList');
+const progressBar=document.getElementById('progressBar');
+const progressText=document.getElementById('progressText');
+const modalBackdrop=document.getElementById('modalBackdrop');
+const modalLinks=document.getElementById('modalLinks');
+const closeModal=document.getElementById('closeModal');
+const lockInfo=document.getElementById('lockInfo');
+const resetAttemptsBtn=document.getElementById('resetAttempts');
+const totalChaptersEl=document.getElementById('totalChapters');
+const noteText=document.getElementById('noteText');
+const saveNoteBtn=document.getElementById('saveNote');
+const clearNoteBtn=document.getElementById('clearNote');
+const noteSaved=document.getElementById('noteSaved');
+
+/* ===========================
+   State
+   =========================== */
+let attempts=loadAttempts()||0;
+let lockInterval=null;
+let autoLockTimer=null;
+
+/* ===========================
+   Chapters Rendering
+   =========================== */
+function renderChapters(){
+  chaptersList.innerHTML='';
+  const saved=loadProgress();
+  chapters.forEach(ch=>{
+    const div=document.createElement('div');
+    div.className='chapter';
+    div.innerHTML=`
+      <div class="meta">
+        <div>
+          <h4>${ch.title}</h4>
+          <div style="color:var(--muted);font-size:13px">${ch.link?'পিডিএফ উপলব্ধ':'পিডিএফ নেই'}</div>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="small-btn" data-id="${ch.id}" ${!ch.link?'disabled':''}>খুলো</button>
+        <label class="checkbox"><input type="checkbox" ${saved[ch.id]?'checked':''}> সম্পন্ন</label>
+      </div>`;
+    chaptersList.appendChild(div);
+  });
+  updateProgress();
+}
+function updateProgress(){
+  const saved=loadProgress();
+  const done=Object.values(saved).filter(v=>v).length;
+  const pct=Math.round((done/chapters.length)*100);
+  progressBar.style.width=pct+'%';
+  progressText.textContent='প্রগতি: '+pct+'%';
+}
+
+/* ===========================
+   Unlock Logic
+   =========================== */
+function lockApp(msg){
+  chaptersArea.style.display='none';
+  unlockBtn.disabled=true;
+  pwInput.disabled=true;
+  let until=Date.now()+LOCK_SECONDS*1000;
+  saveLockUntil(until);
+  lockInfo.style.display='inline';
+  lockInfo.textContent=`লক হয়েছে ${LOCK_SECONDS} সেকেন্ডের জন্য`;
+  lockInterval=setInterval(()=>{
+    const rem=Math.ceil((until-Date.now())/1000);
+    if(rem<=0){ clearInterval(lockInterval); unlockBtn.disabled=false; pwInput.disabled=false; lockInfo.style.display='none'; saveLockUntil(null); }
+    else lockInfo.textContent=`লক হয়েছে ${rem} সেকেন্ডের জন্য`;
+  },500);
+}
+function unlockApp(){
+  if(isUnlocked()) return showChapters();
+  if(loadLockUntil() && Date.now()<loadLockUntil()){ lockApp(); return; }
+
+  const val=pwInput.value.trim();
+  if(val===CORRECT_PW){
+    attempts=0;
+    saveAttempts(attempts);
+    saveUnlocked(true);
+    showChapters();
+  }else{
+    attempts++;
+    saveAttempts(attempts);
+    warnMsg.style.display='block';
+    setTimeout(()=>warnMsg.style.display='none',1800);
+    if(attempts>=MAX_ATTEMPTS) lockApp();
+  }
+}
+function showChapters(){
+  chaptersArea.style.display='block';
+  renderChapters();
+  pwInput.value='';
+  startAutoLock();
+}
+
+/* ===========================
+   Auto Lock Every Minute
+   =========================== */
+function startAutoLock(){
+  if(autoLockTimer) clearTimeout(autoLockTimer);
+  autoLockTimer=setTimeout(()=>{
+    saveUnlocked(false);
+    alert('অ্যাপ স্বয়ংক্রিয়ভাবে লক হয়েছে।');
+    location.reload();
+  },AUTO_LOCK_INTERVAL);
+}
+document.addEventListener('click',startAutoLock);
+
+/* ===========================
+   Events
+   =========================== */
+unlockBtn.addEventListener('click',unlockApp);
+pwInput.addEventListener('keydown',e=>{if(e.key==='Enter') unlockApp();});
+resetAttemptsBtn.addEventListener('click',()=>{ attempts=0; saveAttempts(attempts); lockInfo.style.display='none'; });
+
+chaptersList.addEventListener('change',e=>{
+  if(e.target.tagName==='INPUT' && e.target.type==='checkbox'){
+    const chId=parseInt(e.target.closest('.chapter').querySelector('button')?.dataset.id);
+    if(chId){ let prog=loadProgress(); prog[chId]=e.target.checked; saveProgress(prog); updateProgress(); }
+  }
+});
+chaptersList.addEventListener('click',e=>{
+  if(e.target.tagName==='BUTTON'){
+    const chId=parseInt(e.target.dataset.id);
+    if(chId && chapters[chId-1].link) openModal(chapters[chId-1].link);
+  }
+});
+
+/* ===========================
+   Modal
+   =========================== */
+function openModal(link){ modalLinks.innerHTML=`<a href="${link}" target="_blank" class="link">পিডিএফ খুলুন</a>`; modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); }
+closeModal.addEventListener('click',()=>{ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); });
+
+/* ===========================
+   Notes
+   =========================== */
+noteText.value=loadNote();
+saveNoteBtn.addEventListener('click',()=>{
+  saveNote(noteText.value);
+  noteSaved.style.display='block';
+  setTimeout(()=>noteSaved.style.display='none',1800);
+});
+clearNoteBtn.addEventListener('click',()=>{
+  noteText.value=''; saveNote(''); noteSaved.style.display='none';
+});
+
+/* ===========================
+   Audio Player
+   =========================== */
+const audioInput=document.getElementById('audioFile');
+const player=document.getElementById('player');
+const playPauseAudio=document.getElementById('playPauseAudio');
+const fileNameEl=document.getElementById('fileName');
+let isPlaying=false;
+
+audioInput.addEventListener('change',()=>{
+  const file=audioInput.files[0];
+  if(file){
+    const url=URL.createObjectURL(file);
+    player.src=url;
+    player.style.display='block';
+    playPauseAudio.disabled=false;
+    fileNameEl.textContent=file.name;
+    isPlaying=false; playPauseAudio.textContent='প্লে';
+  }
+});
+playPauseAudio.addEventListener('click',()=>{
+  if(isPlaying){ player.pause(); playPauseAudio.textContent='প্লে'; isPlaying=false; }
+  else{ player.play(); playPauseAudio.textContent='পজ'; isPlaying=true; }
+});
+
+/* ===========================
+   Pomodoro Timer
+   =========================== */
+let timerInterval=null, timerSec=25*60, isBreak=false;
+const timeDisplay=document.getElementById('timeDisplay');
+const timerState=document.getElementById('timerState');
+const startTimer=document.getElementById('startTimer');
+const pauseTimer=document.getElementById('pauseTimer');
+const resetTimer=document.getElementById('resetTimer');
+
+function updateTimerDisplay(){
+  const m=Math.floor(timerSec/60).toString().padStart(2,'0');
+  const s=(timerSec%60).toString().padStart(2,'0');
+  timeDisplay.textContent=`${m}:${s}`;
+  timerState.textContent=isBreak?'বিরতি':'কাজ চলছে';
+}
+
+function startPomodoro(){
+  if(timerInterval) return;
+  timerInterval=setInterval(()=>{
+    timerSec--;
+    updateTimerDisplay();
+    if(timerSec<=0){ clearInterval(timerInterval); timerInterval=null; isBreak=!isBreak; timerSec=isBreak?5*60:25*60; alert(isBreak?'বিরতি শুরু':'কাজ শুরু'); updateTimerDisplay(); startPomodoro(); }
+  },1000);
+}
+function pausePomodoro(){ clearInterval(timerInterval); timerInterval=null; }
+function resetPomodoro(){ clearInterval(timerInterval); timerInterval=null; isBreak=false; timerSec=25*60; updateTimerDisplay(); }
+
+startTimer.addEventListener('click',startPomodoro);
+pauseTimer.addEventListener('click',pausePomodoro);
+resetTimer.addEventListener('click',resetPomodoro);
+
+/* ===========================
+   Init
+   =========================== */
+if(isUnlocked()) showChapters();
+</script>
+</body>
+</html>
+
+
